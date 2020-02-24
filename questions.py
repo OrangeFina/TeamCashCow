@@ -468,12 +468,10 @@ def risk_questionnaire():
 
 def response_list():
     #store user input using list
-    #benefits: each response stored in different column
-    #to do: add user data into list before adding in csv
-
+    
     response = risk_questionnaire()
 
-    with open("data.csv", "a") as data:
+    with open("user_response.csv", "a") as data:
         writer = csv.writer(data)
         writer.writerows([response])
 
