@@ -1,0 +1,77 @@
+import requests
+import time
+from bs4 import BeautifulSoup
+import pandas as pd
+import csv
+import json 
+
+# start_date = input('What do you want the start date yyyy-mm-dd for scrapping to be? ')
+# end_date = input('What do you want the end date yyyy-mm-dd for scrapping to be? ')
+
+start_date = '2015-01-01'
+end_date = '2020-02-28'
+counter = input('Which company do you want to look at? ')
+pages_final = 100
+page = 0
+
+# all_results = {}
+# all_results_1 = {}
+text1 = []
+column_names = ['Date','Title','Content']
+
+title_results = []
+content_results = []
+time_results = []
+
+for item in range(0, pages_final):    
+    page = int(page)
+    page = page + 1
+    page = str(page)
+    url1 = 'https://www.ft.com/search?q='
+    url1 += counter
+    url1 += '&page=' + page
+    url1 += '&dateTo=' + end_date 
+    url1 += '&dateFrom=' + start_date
+    url1 += '&sort=relevance&expandRefinements=true&contentType=article'
+    print(url1)
+
+    resp = requests.get(url1)
+
+    sauce = BeautifulSoup(resp.text, 'html.parser')
+
+
+    title_entry = sauce.find_all("a", attrs = {"class": "js-teaser-heading-link"})
+    content_entry = sauce.find_all("a", attrs = {"class": "js-teaser-standfirst-link"})
+    time_entry = sauce.find_all("time", attrs = {"class": "o-teaser__timestamp-date"})
+
+    
+    for title1 in title_entry:
+        title = title1.text
+        title_results.append(title)
+       
+        
+    
+    for content1 in content_entry:
+        content = content1.text
+        content_results.append(content)
+
+    
+    for time1 in time_entry:
+        date = time1.text
+        time_results.append(date)
+        
+    time.sleep(2)
+    
+
+time_df = pd.DataFrame(data = time_results)
+title_df = pd.DataFrame(data = title_results)
+content_df = pd.DataFrame(data = content_results)
+
+all_results= pd.concat([time_df,title_df,content_df], axis=1,join='inner')
+all_results.columns = ['Date','Title','Content']
+
+
+all_results.to_csv('Apple_3.csv')
+
+all_results.to_json (r'C:\Users\Kyle Ker\Appl.json')
+all_results
